@@ -1,13 +1,22 @@
 
+import { db } from '../db';
+import { issueTagsTable } from '../db/schema';
 import { type CreateIssueTagInput, type IssueTag } from '../schema';
 
-export async function createIssueTag(input: CreateIssueTagInput): Promise<IssueTag> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is creating a new issue tag.
-    // Should check for tag name uniqueness before creating.
-    return Promise.resolve({
-        id: 0, // Placeholder ID
-        name: input.name,
-        created_at: new Date()
-    } as IssueTag);
-}
+export const createIssueTag = async (input: CreateIssueTagInput): Promise<IssueTag> => {
+  try {
+    // Insert issue tag record
+    const result = await db.insert(issueTagsTable)
+      .values({
+        name: input.name
+      })
+      .returning()
+      .execute();
+
+    const issueTag = result[0];
+    return issueTag;
+  } catch (error) {
+    console.error('Issue tag creation failed:', error);
+    throw error;
+  }
+};
